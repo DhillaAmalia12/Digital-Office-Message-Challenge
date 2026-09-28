@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Office Message Challenge</title>
+<style>
+:root{
+  --ink:#172033;--muted:#647084;--bg:#f5f7fb;--card:#fff;--line:#e5e9f2;
+  --primary:#5b5bd6;--primary2:#7c5cff;--good:#16845b;--bad:#c13b55;
+  --gold:#e7a93b;--shadow:0 18px 45px rgba(31,43,72,.10);--radius:22px;
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(145deg,#f7f8fc,#eef1fb);color:var(--ink)}
+button,input,textarea{font:inherit} button{cursor:pointer}
+.app{min-height:100vh}.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1120px;margin:auto;padding:14px 20px;display:flex;align-items:center;gap:18px}
+.brand{font-weight:800;letter-spacing:-.3px;white-space:nowrap}.brand span{color:var(--primary)}
+.progress-wrap{flex:1}.progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}.progress{height:8px;background:#e8ebf3;border-radius:99px;overflow:hidden}.progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--primary),var(--primary2));transition:.35s}
+.container{max-width:1120px;margin:auto;padding:28px 20px 60px}.screen{display:none;animation:in .3s ease}.screen.active{display:block}@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.hero{min-height:78vh;display:grid;place-items:center}.hero-card{max-width:850px;text-align:center;background:rgba(255,255,255,.86);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:32px;padding:48px 34px}
+.logo{width:78px;height:78px;margin:0 auto 18px;border-radius:24px;display:grid;place-items:center;color:white;font-size:34px;background:linear-gradient(135deg,var(--primary),var(--primary2));box-shadow:0 12px 25px rgba(91,91,214,.25)}
+h1{font-size:clamp(34px,6vw,62px);line-height:1.02;margin:0 0 12px;letter-spacing:-2px}.tagline{font-size:18px;color:var(--muted);margin-bottom:30px}.field{max-width:430px;margin:0 auto 18px;text-align:left}.field label{font-size:13px;font-weight:700;display:block;margin-bottom:7px}.field input,.field textarea,.email-field input{width:100%;border:1px solid var(--line);background:#fbfcff;border-radius:14px;padding:13px 14px;outline:none}.field input:focus,.field textarea:focus,.email-field input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(91,91,214,.10)}
+.btn{border:0;border-radius:13px;padding:12px 17px;font-weight:750;transition:.18s}.btn:hover{transform:translateY(-1px)}.btn-primary{color:#fff;background:linear-gradient(135deg,var(--primary),var(--primary2));box-shadow:0 8px 18px rgba(91,91,214,.22)}.btn-soft{background:#eef0ff;color:#4d4dc4}.btn-outline{background:#fff;border:1px solid var(--line);color:var(--ink)}.btn-danger{background:#fff0f3;color:var(--bad)}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:25px}.section-title{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;margin-bottom:20px}.eyebrow{font-size:12px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:1px}.section-title h2{margin:5px 0 6px;font-size:28px;letter-spacing:-.7px}.muted{color:var(--muted)}.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{background:#f0f2f8;border-radius:99px;padding:6px 10px;font-size:12px;font-weight:700}.mission{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}.scenario{background:linear-gradient(135deg,#f6f6ff,#f8fbff);border:1px solid #e6e7ff;border-radius:18px;padding:18px}.scenario h3{margin-top:0}.choices{display:grid;gap:11px;margin-top:16px}.choice{padding:15px;border:1px solid var(--line);background:white;border-radius:15px;text-align:left;display:flex;gap:12px;align-items:flex-start}.choice:hover{border-color:#aaa9ee;background:#fbfbff}.choice.selected{border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,91,214,.09)}.choice.correct{border-color:#8bd5b5;background:#f1fff8}.choice.wrong{border-color:#f0a0b0;background:#fff5f7}
+.feedback{margin-top:16px;border-radius:16px;padding:16px;border:1px solid var(--line);display:none}.feedback.show{display:block}.feedback.good{background:#f1fff8;border-color:#bfead6}.feedback.bad{background:#fff6f8;border-color:#f3c1cb}.feedback strong{display:block;margin-bottom:5px}.hint{margin-top:10px;padding:12px;border-radius:13px;background:#fff9e9;border:1px solid #f2dfaa;color:#705415;display:none}.hint.show{display:block}
+.order-list{display:grid;gap:10px}.order-item{padding:14px;border:1px solid var(--line);border-radius:14px;background:white;display:flex;align-items:center;justify-content:space-between;gap:10px}.order-controls{display:flex;gap:5px}.small{padding:7px 9px;border-radius:9px;border:1px solid var(--line);background:#fff}
+textarea{min-height:150px;resize:vertical}.composer{display:grid;gap:12px}.whatsapp{background:#edf8f1;border-radius:20px;padding:18px}.bubble{background:white;border-radius:16px 16px 16px 5px;padding:13px;box-shadow:0 4px 12px rgba(0,0,0,.05);max-width:85%;margin-bottom:10px}.bubble.me{margin-left:auto;border-radius:16px 16px 5px 16px;background:#dcf8c6}.email{border:1px solid var(--line);border-radius:18px;overflow:hidden}.email-head{padding:16px;background:#f8f9fc;border-bottom:1px solid var(--line)}.email-field{display:grid;grid-template-columns:80px 1fr;gap:10px;align-items:center;margin:8px 0}.email-body{padding:16px}.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.score-box{padding:16px;background:#f8f9fd;border:1px solid var(--line);border-radius:16px}.score-box b{font-size:28px;display:block}.report-table{width:100%;border-collapse:collapse;margin-top:15px}.report-table th,.report-table td{padding:11px 9px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}.bar{height:9px;background:#eceef5;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),var(--primary2))}
+.footer-actions{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}.center{text-align:center}.notice{padding:13px 15px;background:#f6f7fb;border:1px solid var(--line);border-radius:14px;font-size:13px}.final-lock{padding:12px 14px;background:#f8f1ff;border:1px solid #e2d2f4;border-radius:14px;color:#67428a;font-size:13px}
+@media(max-width:800px){.mission{grid-template-columns:1fr}.score-grid{grid-template-columns:1fr}.topbar-inner{flex-wrap:wrap}.progress-wrap{order:3;flex-basis:100%}.hero-card{padding:34px 20px}.container{padding:20px 14px 45px}.card{padding:19px}.email-field{grid-template-columns:65px 1fr}}
+@media print{.topbar,.no-print,button{display:none!important}.screen{display:none!important}.screen#report{display:block!important}.container{max-width:none;padding:0}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">Digital <span>Office</span> Message Challenge</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span id="progressText">Belum dimulai</span><span id="levelText"></span></div>
+      <div class="progress"><i id="progressBar"></i></div>
+    </div>
+    <button class="btn btn-outline no-print" onclick="resetGame()">Reset</button>
+  </div>
+</header>
+
+<main class="container">
+<section id="home" class="screen active hero">
+ <div class="hero-card">
+   <div class="logo">✉</div>
+   <div class="eyebrow">MPLB • Kelas XI</div>
+   <h1>Digital Office<br>Message Challenge</h1>
+   <p class="tagline">Can You Communicate Professionally?</p>
+   <div class="field">
+     <label for="studentName">Nama siswa</label>
+     <input id="studentName" placeholder="Masukkan nama..." maxlength="60">
+   </div>
+   <button class="btn btn-primary" onclick="startGame()">Mulai Game →</button>
+   <p class="muted" style="font-size:12px;margin-top:18px">Latihan komunikasi digital dalam konteks kerja • ±20–30 menit</p>
+ </div>
+</section>
+
+<section id="briefing" class="screen">
+ <div class="card">
+  <div class="section-title"><div><div class="eyebrow">Briefing</div><h2>5 Prinsip Pesan Profesional</h2><p class="muted">Gunakan prinsip ini sebagai bekal sebelum menjalankan misi.</p></div><span class="chip">1 / 7</span></div>
+  <div class="score-grid">
+   <div class="score-box"><b>01</b><strong>Tujuan jelas</strong><p class="muted">Penerima tahu mengapa pesan dikirim.</p></div>
+   <div class="score-box"><b>02</b><strong>Runtut</strong><p class="muted">Informasi disusun dengan urutan yang mudah dipahami.</p></div>
+   <div class="score-box"><b>03</b><strong>Bahasa tepat</strong><p class="muted">Gunakan tata bahasa, ejaan, dan tanda baca yang tepat.</p></div>
+   <div class="score-box"><b>04</b><strong>Profesional</strong><p class="muted">Sesuaikan gaya bahasa dengan penerima dan situasi.</p></div>
+   <div class="score-box"><b>05</b><strong>Relevan</strong><p class="muted">Sampaikan informasi yang dibutuhkan untuk tindakan berikutnya.</p></div>
+  </div>
+  <div class="footer-actions"><span></span><button class="btn btn-primary" onclick="showLevel(1)">Mulai Level 1 →</button></div>
+ </div>
+</section>
+
+<section id="level1" class="screen">
+ <div class="card">
+  <div class="section-title"><div><div class="eyebrow">Level 1 • Choose the Right Message</div><h2>Klien menunggu dokumen</h2><p class="muted">Pilih respons yang paling sesuai, lalu jelaskan alasanmu.</p></div><span class="chip">Branching Scenario</span></div>
+  <div class="mission">
+   <div class="scenario"><h3>Situasi</h3><p>Atasan meminta kamu memberi tahu klien bahwa dokumen resmi baru dapat dikirim besok karena masih menunggu tanda tangan pimpinan.</p><p><strong>Penerima:</strong> klien eksternal</p><p><strong>Tujuan:</strong> memberi informasi dan mengelola ekspektasi tanpa membuat janji yang tidak pasti.</p></div>
+   <div>
+    <div class="choices" id="l1choices"></div>
+    <div class="feedback" id="l1feedback"></div>
+    <div class="hint" id="l1hint"></div>
+    <div class="footer-actions"><button class="btn btn-soft no-print" onclick="useHint(1)">💡 Hint <span id="hint1count"></span></button><button class="btn btn-primary" id="l1next" disabled onclick="showLevel(2)">Lanjut →</button></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section id="level2" class="screen">
+ <div class="card">
+  <div class="section-title"><div><div class="eyebrow">Level 2 • Message Detective</div><h2>Temukan masalahnya</h2><p class="muted">Tidak semua bagian pesan salah. Pilih bagian yang memang perlu diperbaiki dan jenis masalahnya.</p></div><span class="chip">Error Hunting</span></div>
+  <div class="scenario"><strong>WhatsApp kepada atasan:</strong><br><br>“Hallo Pak, saya mau ngasih tau kalau laporan penjualan kemarin udah selesai. Tolong dicek ya karena besok mau dipakai.”</div>
+  <div style="margin-top:18px" class="choices" id="l2choices"></div>
+  <div class="feedback" id="l2feedback"></div><div class="hint" id="l2hint"></div>
+  <div class="footer-actions"><button class="btn btn-soft" onclick="useHint(2)">💡 Hint <span id="hint2count"></span></button><button class="btn btn-primary" id="l2next" disabled onclick="showLevel(3)">Lanjut →</button></div>
+ </div>
+</section>
+
+<section id="level3" class="screen">
+ <div class="card">
+  <div class="section-title"><div><div class="eyebrow">Level 3 • Message Architect</div><h2>Bangun struktur pesan</h2><p class="muted">Pilih komponen yang relevan lalu susun dengan urutan logis. Ada distraktor.</p></div><span class="chip">Sequencing</span></div>
+  <div class="scenario"><strong>Kasus:</strong> Kamu perlu memberi tahu atasan bahwa laporan penjualan selesai pukul 15.00 dan dapat dikirim setelah diperiksa.</div>
+  <div id="l3list" class="order-list" style="margin-top:16px"></div>
+  <div class="feedback" id="l3feedback"></div><div class="hint" id="l3hint"></div>
+  <div class="footer-actions"><button class="btn btn-soft" onclick="useHint(3)">💡 Hint <span id="hint3count"></span></button><button class="btn btn-primary" onclick="checkLevel3()">Periksa Susunan</button></div>
+ </div>
+</section>
+
+<section id="level4" class="screen">
+ <div class="card">
+  <div class="section-title"><div><div class="eyebrow">Level 4 • Fix the Message</div><h2>Perbaiki pesan</h2><p class="muted">Tulis ulang pesan berikut agar lebih jelas dan profesional.</p></div><span class="chip">Construction</span></div>
+  <div class="scenario">“Hallo kak, saya mau tanya laporan kemarin udah selesai belum? Kalau belum tolong diselesaiin ya karena besok mau dipakai.”</div>
+  <div class="field" style="max-width:none;margin-top:16px"><label>Versi perbaikanmu</label><textarea id="l4text" placeholder="Tulis pesan yang sudah diperbaiki..."></textarea></div>
+  <div class="feedback" id="l4feedback"></div><div class="hint" id="l4hint"></div>
+  <div class="footer-actions"><button class="btn btn-soft" onclick="useHint(4)">💡 Hint <span id="hint4count"></span></button><button class="btn btn-primary" onclick="checkLevel4()">Nilai Jawaban</button></div>
+ </div>
+</section>
+
+<section id="level5" class="screen">
+ <div class="card">
+  <div class="section-title"><div><div class="eyebrow">Level 5 • Build the WhatsApp</div><h2>Tulis pesan kepada atasan</h2><p class="muted">Buat pesan sendiri berdasarkan situasi berikut.</p></div><span class="chip">Construction Challenge</span></div>
+  <div class="whatsapp">
+   <div class="bubble"><strong>Atasan</strong><br>“Tolong segera kirim laporan penjualan kalau sudah selesai.”</div>
+   <div class="bubble">Laporan penjualan selesai pukul <strong>15.00</strong> dan perlu diperiksa sebelum dikirim.</div>
+   <div class="bubble me"><strong>Kamu</strong><br><span class="muted">Tulis pesanmu di bawah...</span></div>
+  </div>
+  <div class="field" style="max-width:none;margin-top:16px"><textarea id="l5text" placeholder="Tulis WhatsApp profesional kepada atasan..."></textarea></div>
+  <div class="feedback" id="l5feedback"></div><div class="hint" id="l5hint"></div>
+  <div class="footer-actions"><button class="btn btn-soft" onclick="useHint(5)">💡 Hint <span id="hint5count"></span></button><button class="btn btn-primary" onclick="checkLevel5()">Kirim & Nilai</button></div>
+ </div>
+</section>
+
+<section id="level6" class="screen">
+ <div class="card">
+  <div class="section-title"><div><div class="eyebrow">Level 6 • Build the Email</div><h2>Tulis email kepada klien</h2><p class="muted">Klien meminta dokumen hari ini, tetapi dokumen baru dapat dikirim besok pukul 10.00.</p></div><span class="chip">Email Challenge</span></div>
+  <div class="email">
+   <div class="email-head">
+    <div class="email-field"><strong>To</strong><input value="klien@contoh.co.id" readonly></div>
+    <div class="email-field"><strong>Subject</strong><input id="l6subject" placeholder="Tulis subject email..."></div>
+   </div>
+   <div class="email-body"><textarea id="l6body" placeholder="Tulis email profesional kepada klien..."></textarea></div>
+  </div>
+  <div class="feedback" id="l6feedback"></div><div class="hint" id="l6hint"></div>
+  <div class="footer-actions"><button class="btn btn-soft" onclick="useHint(6)">💡 Hint <span id="hint6count"></span></button><button class="btn btn-primary" onclick="checkLevel6()">Kirim & Nilai</button></div>
+ </div>
+</section>
+
+<section id="final" class="screen">
+ <div class="card">
+  <div class="section-title"><div><div class="eyebrow">Final Challenge • Kasus Baru</div><h2>Customer complaint</h2><p class="muted">Kerjakan secara mandiri. Setelah dikirim, jawaban dikunci sebelum feedback muncul.</p></div><span class="chip">Max 1 Hint</span></div>
+  <div class="final-lock">🔒 Tantangan akhir menguji transfer kemampuan. Tidak ada contoh jawaban.</div>
+  <div class="scenario" style="margin-top:16px"><strong>Kasus:</strong> Seorang pelanggan mengeluhkan bahwa dokumen yang sebelumnya dijanjikan belum diterima. Kamu perlu melaporkan keluhan tersebut kepada atasan dan memberi penjelasan profesional kepada pelanggan bahwa dokumen akan dikirim pada hari berikutnya.</div>
+  <div style="margin-top:18px" class="composer">
+   <label><strong>1. WhatsApp kepada atasan</strong></label><textarea id="fwa" placeholder="Tulis laporan singkat dan profesional kepada atasan..."></textarea>
+   <label><strong>2. Subject email kepada pelanggan</strong></label><input id="fesub" placeholder="Tulis subject email...">
+   <label><strong>3. Email kepada pelanggan</strong></label><textarea id="fe" placeholder="Tulis email profesional kepada pelanggan..."></textarea>
+  </div>
+  <div class="hint" id="fhint"></div>
+  <div class="feedback" id="ffeed"></div>
+  <div class="footer-actions"><button class="btn btn-soft" id="finalHintBtn" onclick="useFinalHint()">💡 Gunakan 1 Hint</button><button class="btn btn-primary" id="finalSubmit" onclick="submitFinal()">Kirim Final Challenge</button></div>
+ </div>
+</section>
+
+<section id="report" class="screen">
+ <div class="card">
+  <div class="section-title"><div><div class="eyebrow">Teacher Learning Report</div><h2 id="reportTitle">Laporan Belajar</h2><p class="muted">Gunakan laporan ini sebagai informasi pendukung untuk melihat bagian yang sudah dan belum dikuasai.</p></div></div>
+  <div class="score-grid">
+   <div class="score-box"><span class="muted">Skor keseluruhan</span><b id="rTotal">0%</b><span id="rTarget"></span></div>
+   <div class="score-box"><span class="muted">Percobaan</span><b id="rAttempts">0</b><span class="muted">seluruh aktivitas</span></div>
+   <div class="score-box"><span class="muted">Hint digunakan</span><b id="rHints">0</b><span class="muted">maks. latihan 3/level</span></div>
+  </div>
+  <div class="score-grid" style="margin-top:12px">
+   <div class="score-box"><span class="muted">Struktur</span><b id="rStruct">0%</b><div class="bar"><i id="rbStruct"></i></div></div>
+   <div class="score-box"><span class="muted">Tata bahasa</span><b id="rGrammar">0%</b><div class="bar"><i id="rbGrammar"></i></div></div>
+   <div class="score-box"><span class="muted">Bahasa profesional</span><b id="rPro">0%</b><div class="bar"><i id="rbPro"></i></div></div>
+  </div>
+  <h3 style="margin-top:26px">Ringkasan indikator</h3>
+  <table class="report-table"><thead><tr><th>Aktivitas</th><th>Skor</th><th>Status</th><th>Catatan</th></tr></thead><tbody id="reportRows"></tbody></table>
+  <h3 style="margin-top:26px">Rekomendasi tindak lanjut</h3>
+  <div id="recommendations" class="choices"></div>
+  <div class="footer-actions no-print">
+   <button class="btn btn-outline" onclick="window.print()">🖨 Cetak / Simpan PDF</button>
+   <button class="btn btn-primary" onclick="resetGame()">Mainkan Lagi</button>
+  </div>
+ </div>
+</section>
+</main>
+</div>
+
+<script>
+const state={
+ name:"", level:0, attempts:0, hints:0, hintUsed:{}, results:{},
+ finalSubmitted:false, finalHint:false
+};
+const levels=["Briefing","Choose the Right Message","Message Detective","Message Architect","Fix the Message","Build the WhatsApp","Build the Email","Final Challenge"];
+function save(){localStorage.setItem("domc_state",JSON.stringify(state))}
+function load(){try{const s=JSON.parse(localStorage.getItem("domc_state"));if(s)Object.assign(state,s)}catch(e){}}
+function resetGame(){
+ localStorage.removeItem("domc_state"); location.reload();
+}
+function startGame(){
+ const n=document.getElementById("studentName").value.trim();
+ if(!n){alert("Masukkan nama siswa terlebih dahulu.");return}
+ state.name=n; state.level=0; state.attempts=0; state.hints=0; state.hintUsed={}; state.results={}; state.finalSubmitted=false;state.finalHint=false;save();
+ showLevel(0);
+}
+function showLevel(n){
+ document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+ const id=["briefing","level1","level2","level3","level4","level5","level6","final","report"][n];
+ document.getElementById(id).classList.add("active");
+ state.level=n; save(); updateProgress();
+ window.scrollTo({top:0,behavior:"smooth"});
+ if(n===1)initL1(); if(n===2)initL2(); if(n===3)initL3(); if(n===7)updateFinalState(); if(n===8)renderReport();
+}
+function updateProgress(){
+ const p=state.level/8*100; document.getElementById("progressBar").style.width=p+"%";
+ document.getElementById("progressText").textContent=state.name?state.name:"Belum dimulai";
+ document.getElementById("levelText").textContent=state.name?(levels[Math.min(state.level,7)]||"Selesai"):"";
+}
+function useHint(level){
+ const max=3;if((state.hintUsed[level]||0)>=max){alert("Kamu sudah menggunakan 3 hint pada level ini.");return}
+ state.hintUsed[level]=(state.hintUsed[level]||0)+1;state.hints++;
+ const hints={
+ 1:["Perhatikan siapa penerima pesan dan apa tujuan komunikasinya.","Klien eksternal membutuhkan informasi yang jelas tanpa janji yang belum pasti.","Pastikan pesan menyebut kondisi dokumen dan waktu pengiriman secara profesional."],
+ 2:["Cari kata yang terlalu santai atau tidak baku.","Periksa kapitalisasi, tanda baca, dan pilihan kata.","Bayangkan pesan ini dibaca atasan: bagian mana yang paling perlu diperbaiki?"],
+ 3:["Mulai dari salam/pembuka lalu tujuan.","Informasi utama harus muncul sebelum tindak lanjut.","Penutup atau ajakan tindakan berada setelah informasi utama."],
+ 4:["Pertahankan informasi asli, tetapi ubah sapaan dan pilihan kata.","Perhatikan kalimat efektif dan tanda baca.","Buat pesan yang sopan, jelas, dan langsung pada tujuan."],
+ 5:["Penerima adalah atasan. Sebutkan status laporan dan waktu selesai.","Tambahkan informasi tentang pemeriksaan/pengiriman.","Gunakan sapaan dan penutup yang sesuai konteks kantor."],
+ 6:["Subject harus langsung menunjukkan isi email.","Sampaikan kondisi dokumen dengan jujur dan waktu pengiriman.","Gunakan salam, isi yang runtut, dan penutup profesional."]
+ };
+ const el=document.getElementById("l"+level+"hint");el.textContent=hints[level][state.hintUsed[level]-1];el.classList.add("show");
+ document.getElementById("hint"+level+"count").textContent=`(${state.hintUsed[level]}/3)`;save();
+}
+function useFinalHint(){
+ if(state.finalHint){return} state.finalHint=true;state.hints++;
+ document.getElementById("fhint").textContent="Petunjuk: laporan kepada atasan harus ringkas dan faktual. Email kepada pelanggan harus mengakui kendala, memberi informasi waktu pengiriman, dan menggunakan bahasa profesional.";
+ document.getElementById("fhint").classList.add("show");document.getElementById("finalHintBtn").disabled=true;save();
+}
+function feedback(id,good,title,msg){
+ const el=document.getElementById(id);el.className="feedback show "+(good?"good":"bad");el.innerHTML=`<strong>${title}</strong><div>${msg}</div>`;
+}
+function initL1(){
+ const choices=[
+  ["A","“Selamat siang, Bapak/Ibu. Kami informasikan bahwa dokumen resmi masih menunggu tanda tangan pimpinan sehingga baru dapat kami kirim besok. Terima kasih atas pengertiannya.”",true,"Tujuan dan kondisi dokumen jelas, penerima diperhatikan, dan tidak ada janji yang melampaui informasi kasus."],
+  ["B","“Dokumennya belum selesai ya. Besok pasti kami kirim, mohon tunggu.”",false,"Informasinya terlalu singkat dan kata “pasti” dapat menjadi janji yang tidak didukung konteks."],
+  ["C","“Halo kak, dokumen belum bisa dikirim. Nanti kalau sudah selesai kami kabari.”",false,"Bahasanya terlalu santai dan tidak memberikan informasi waktu yang dibutuhkan klien."],
+  ["D","“Kami tidak bisa mengirim dokumen hari ini karena pimpinan belum tanda tangan. Silakan tunggu besok.”",false,"Informasi utama ada, tetapi pilihan kata dan nada perintah kurang sesuai untuk komunikasi profesional dengan klien."]
+ ];
+ const box=document.getElementById("l1choices");box.innerHTML="";
+ choices.forEach((c,i)=>{const b=document.createElement("button");b.className="choice";b.innerHTML=`<b>${c[0]}</b><span>${c[1]}</span>`;b.onclick=()=>{document.querySelectorAll("#l1choices .choice").forEach(x=>x.classList.remove("selected","correct","wrong"));b.classList.add(c[2]?"correct":"wrong");state.attempts++;state.results.l1={score:c[2]?100:55,note:c[3]};feedback("l1feedback",c[2],c[2]?"Pilihan tepat":"Masih perlu diperbaiki",c[3]);document.getElementById("l1next").disabled=false;save()};box.appendChild(b)});
+}
+function initL2(){
+ const choices=[
+  ["Struktur/kejelasan","“saya mau ngasih tau kalau” membuat tujuan kurang ringkas.",true],
+  ["Tata bahasa & kata baku","“ngasih tau” dan “udah” kurang tepat untuk konteks profesional.",true],
+  ["Bahasa profesional","“Hallo Pak” dan “Tolong dicek ya” perlu disesuaikan agar lebih profesional.",true],
+  ["Informasi waktu","Pesan sama sekali tidak menyebut kapan laporan selesai.",false]
+ ];
+ const box=document.getElementById("l2choices");box.innerHTML="";
+ choices.forEach((c,i)=>{const b=document.createElement("button");b.className="choice";b.innerHTML=`<span><strong>${c[0]}</strong><br>${c[1]}</span>`;b.onclick=()=>{b.classList.toggle("selected");const selected=[...document.querySelectorAll("#l2choices .selected")].length;if(selected>=3){state.results.l2={score:100,note:"Tiga masalah utama berhasil dikenali; informasi waktu justru sudah ada melalui kata “kemarin”."};feedback("l2feedback",true,"Detektif komunikasi berhasil","Tiga masalah utama adalah kejelasan/struktur, kata baku/tata bahasa, dan bahasa profesional. Informasi waktu bukan masalah utama karena “kemarin” sudah tersedia.");document.getElementById("l2next").disabled=false}state.attempts++;save()};box.appendChild(b)});
+}
+const l3items=[
+ "Salam pembuka: Selamat sore, Pak.",
+ "Tujuan: Saya menginformasikan bahwa laporan penjualan sudah selesai.",
+ "Informasi utama: Laporan selesai pada pukul 15.00 dan siap diperiksa.",
+ "Tindak lanjut: Mohon diperiksa sebelum saya mengirimkannya.",
+ "Penutup: Terima kasih, Pak.",
+ "Distraktor: Saya sedang berada di perjalanan menuju kantor."
+];
+let l3order=[];
+function initL3(){l3order=[0,5,2,1,3,4];renderL3()}
+function renderL3(){const box=document.getElementById("l3list");box.innerHTML="";l3order.forEach((idx,pos)=>{const d=document.createElement("div");d.className="order-item";d.innerHTML=`<span><b>${pos+1}.</b> ${l3items[idx]}</span><span class="order-controls"><button class="small" onclick="moveL3(${pos},-1)">↑</button><button class="small" onclick="moveL3(${pos},1)">↓</button></span>`;box.appendChild(d)})}
+function moveL3(pos,dir){const np=pos+dir;if(np<0||np>=l3order.length)return;[l3order[pos],l3order[np]]=[l3order[np],l3order[pos]];renderL3()}
+function checkLevel3(){
+ state.attempts++;const correct=[0,1,2,3,4],selected=l3order.filter(x=>x!==5);const score=JSON.stringify(selected)===JSON.stringify(correct)?100:Math.max(55,100-Math.abs(selected.indexOf(1)-1)*10-Math.abs(selected.indexOf(2)-2)*10);
+ state.results.l3={score,note:score===100?"Struktur runtut dan distraktor berhasil diabaikan.":"Perhatikan urutan pembuka, tujuan, informasi utama, tindak lanjut, lalu penutup; distraktor tidak diperlukan."};
+ feedback("l3feedback",score===100,"Hasil penyusunan",state.results.l3.note);save();
+}
+function scoreText(text,kind){
+ const t=(text||"").trim(); if(!t)return {score:0,note:"Jawaban masih kosong."};
+ let s=0, notes=[];
+ const lower=t.toLowerCase();
+ const hasGreeting=/\b(selamat|halo|hallo|yth|bapak|ibu)\b/.test(lower);
+ const hasPurpose=/\b(menginformasikan|memberitahu|memberi tahu|melaporkan|mengirim|menyampaikan|dokumen|laporan)\b/.test(lower);
+ const hasProfessional=/\b(mohon|terima kasih|kami|bapak|ibu|silakan|dapat)\b/.test(lower);
+ const hasCasual=/\b(gak|nggak|udah|ngasih|diselesaiin|kak|aja|dong)\b/.test(lower);
+ const hasPunct=/[.!?]/.test(t);
+ const words=t.split(/\s+/).length;
+ if(hasGreeting)s+=20; else notes.push("tambahkan salam/sapaan yang sesuai");
+ if(hasPurpose)s+=25; else notes.push("jelaskan tujuan atau informasi utama");
+ if(hasProfessional)s+=25; else notes.push("sesuaikan pilihan kata agar profesional");
+ if(hasPunct)s+=10; else notes.push("perhatikan tanda baca");
+ if(words>=12)s+=20; else s+=10;
+ if(hasCasual)s-=20,notes.push("hindari kata terlalu informal");
+ s=Math.max(0,Math.min(100,s));
+ return {score:s,note:notes.length?notes.join("; ")+".":"Struktur, bahasa, dan tanda baca sudah cukup baik."};
+}
+function checkLevel4(){state.attempts++;const r=scoreText(document.getElementById("l4text").value);state.results.l4=r;feedback("l4feedback",r.score>=85,r.score>=85?"Sudah memenuhi target":"Masih perlu diperbaiki",`Skor ${r.score}%. ${r.note}`);save()}
+function checkLevel5(){state.attempts++;const r=scoreText(document.getElementById("l5text").value);state.results.l5=r;feedback("l5feedback",r.score>=85,r.score>=85?"Pesan siap dikirim":"Perbaiki beberapa bagian",`Skor ${r.score}%. ${r.note}`);save()}
+function checkLevel6(){state.attempts++;const subj=document.getElementById("l6subject").value.trim(),r=scoreText(document.getElementById("l6body").value);let score=Math.min(100,r.score+(subj.length>8?15:0));score=Math.min(100,score);state.results.l6={score,note:subj.length>8?"Subject dan isi email telah dinilai.":"Subject perlu dibuat lebih spesifik."};feedback("l6feedback",score>=85,score>=85?"Email memenuhi target":"Email masih perlu diperbaiki",`Skor ${score}%. ${state.results.l6.note} ${r.note}`);state.results.l6.score=score;save()}
+function submitFinal(){
+ if(state.finalSubmitted)return;
+ const a=document.getElementById("fwa").value,b=document.getElementById("fesub").value,c=document.getElementById("fe").value;
+ if(!a.trim()||!b.trim()||!c.trim()){alert("Lengkapi ketiga jawaban Final Challenge terlebih dahulu.");return}
+ state.attempts++;state.finalSubmitted=true;
+ const r1=scoreText(a),r2=scoreText(c);let email=Math.min(100,r2.score+(b.length>8?15:0));const score=Math.round((r1.score+email)/2);
+ state.results.final={score,note:`WhatsApp ${r1.score}%, email ${email}%.`};
+ document.querySelectorAll("#final textarea,#final input").forEach(x=>x.disabled=true);document.getElementById("finalSubmit").disabled=true;
+ feedback("ffeed",score>=85,score>=85?"Final Challenge mencapai target":"Final Challenge masih membutuhkan penguatan",`Skor akhir ${score}%. ${state.results.final.note} Jawaban telah dikunci sebelum feedback ditampilkan.`);
+ save();
+ setTimeout(()=>showLevel(8),900);
+}
+function updateFinalState(){if(state.finalSubmitted){document.querySelectorAll("#final textarea,#final input").forEach(x=>x.disabled=true);document.getElementById("finalSubmit").disabled=true}}
+function weightedTotal(){
+ const vals=Object.values(state.results).map(x=>x.score).filter(x=>typeof x==="number");
+ return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
+}
+function renderReport(){
+ document.getElementById("reportTitle").textContent=`Laporan Belajar — ${state.name}`;
+ const total=weightedTotal();document.getElementById("rTotal").textContent=total+"%";document.getElementById("rTarget").textContent=total>=85?"Target ≥85% tercapai":"Target ≥85% belum tercapai";
+ document.getElementById("rAttempts").textContent=state.attempts;document.getElementById("rHints").textContent=state.hints;
+ const scores=Object.values(state.results).map(x=>x.score).filter(x=>typeof x==="number");
+ const struct=Math.round(Math.min(100,total+3)),grammar=Math.round(Math.min(100,total)),pro=Math.round(Math.min(100,total+2));
+ [["rStruct","rbStruct",struct],["rGrammar","rbGrammar",grammar],["rPro","rbPro",pro]].forEach(([a,b,v])=>{document.getElementById(a).textContent=v+"%";document.getElementById(b).style.width=v+"%"});
+ const names={l1:"Level 1 — Strategi komunikasi",l2:"Level 2 — Message Detective",l3:"Level 3 — Message Architect",l4:"Level 4 — Fix the Message",l5:"Level 5 — Build the WhatsApp",l6:"Level 6 — Build the Email",final:"Final Challenge"};
+ const rows=document.getElementById("reportRows");rows.innerHTML="";
+ Object.entries(state.results).forEach(([k,v])=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${names[k]||k}</td><td><strong>${v.score}%</strong></td><td>${v.score>=85?"Tercapai":"Perlu latihan"}</td><td>${v.note||""}</td>`;rows.appendChild(tr)});
+ const rec=[];if(total<85||grammar<85)rec.push(["Tata bahasa perlu latihan","Latih kata baku, kapitalisasi, tanda baca, dan kalimat efektif."]);if(struct<85)rec.push(["Struktur perlu latihan","Latih urutan salam, tujuan, informasi utama, tindak lanjut, dan penutup."]);if(pro<85)rec.push(["Bahasa profesional perlu latihan","Latih penyesuaian sapaan dan pilihan kata berdasarkan penerima."]);if(state.results.final&&state.results.final.score<85)rec.push(["Transfer ke kasus baru perlu diperkuat","Berikan variasi kasus komunikasi kerja sebelum siswa mengerjakan tantangan baru."]);if(!rec.length)rec.push(["Pertahankan kemampuan","Siswa sudah mencapai target; berikan variasi kasus untuk menjaga kemampuan transfer."]);
+ document.getElementById("recommendations").innerHTML=rec.map(x=>`<div class="notice"><strong>${x[0]}</strong><br><span class="muted">${x[1]}</span></div>`).join("");
+}
+load();updateProgress();
+</script>
+</body>
+</html>
